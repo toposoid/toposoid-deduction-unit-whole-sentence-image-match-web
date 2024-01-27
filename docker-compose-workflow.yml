@@ -92,7 +92,7 @@ services:
     image: toposoid/toposoid-common-nlp-english-web:0.5-SNAPSHOT-lowspec
     environment:
       - PRIVATE_IP_ADDRESS=172.30.0.7
-      - TOPOSOID_TY_THRESHHOLD_EN=0.52
+      - TOPOSOID_SYNONYM_NOUN_SIMILARITY_THRESHHOLD_EN=0.52
       - TOPOSOID_SYNONYM_VERB_SIMILARITY_THRESHHOLD_EN=0.52
       - TOPOSOID_WORD2VEC_SIMILARITY_THRESHHOLD_EN=0.78
       - TOPOSOID_SPACY_MODEL_EN=en_core_web_md
