@@ -1,11 +1,16 @@
 version: '3'
 services:
   toposoid-deduction-unit-whole-sentence-image-match-web:
-    image: toposoid/toposoid-deduction-unit-whole-sentence-image-match-web:0.5-SNAPSHOT
+    image: toposoid-deduction-unit-whole-sentence-image-match-web:0.5-SNAPSHOT
+    tty: true
     environment:
-      - PRIVATE_IP_ADDRESS=localhost
+      - PRIVATE_IP_ADDRESS=toposoid-deduction-unit-whole-sentence-image-match-web
       - TOPOSOID_GRAPHDB_HOST=neo4j
       - TOPOSOID_GRAPHDB_WEB_HOST=scala-data-accessor-neo4j-web
+      - TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST=toposoid-sentence-parser-japanese-web
+      - TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT=9001
+      - TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST=toposoid-sentence-parser-english-web
+      - TOPOSOID_SENTENCE_PARSER_EN_WEB_PORT=9007
       - TOPOSOID_COMMON_NLP_JP_WEB_HOST=toposoid-common-nlp-japanese-web
       - TOPOSOID_COMMON_NLP_JP_WEB_PORT=9006
       - TOPOSOID_COMMON_NLP_EN_WEB_HOST=toposoid-common-nlp-english-web
@@ -16,13 +21,28 @@ services:
       - TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST=data-accessor-image-weaviate-web
       - TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT=9011
       - TOPOSOID_IMAGE_VECTORDB_SEARCH_NUM_MAX=5
+      - TOPOSOID_COMMON_IMAGE_RECOGNITION_HOST=toposoid-common-image-recognition-web
+      - TOPOSOID_COMMON_IMAGE_RECOGNITION_PORT=9013
+      - TOPOSOID_CONTENTS_ADMIN_HOST=toposoid-contents-admin-web
+      - TOPOSOID_CONTENTS_ADMIN_PORT=9012
       - PLAY_HTTP_PORT=9105
     ports:
       - 9105:9105
-    depends_on:
-      - neo4j
-      - toposoid-common-nlp-japanese-web
-      - toposoid-common-nlp-english-web
+  scala-data-accessor-neo4j-web:
+    image: toposoid/scala-data-accessor-neo4j-web:0.5-SNAPSHOT
+    environment:
+      - PRIVATE_IP_ADDRESS=scala-data-accessor-neo4j-web
+      - TOPOSOID_GRAPHDB_HOST=neo4j
+      - PLAY_HTTP_PORT=9005
+    ports:
+      - 9005:9005
+  toposoid-sentence-parser-japanese-web:
+    image: toposoid/toposoid-sentence-parser-japanese-web:0.5-SNAPSHOT
+    environment:
+      - PRIVATE_IP_ADDRESS=toposoid-sentence-parser-japanese-web
+      - PLAY_HTTP_PORT=9001
+    ports:
+      - 9001:9001
   toposoid-common-nlp-japanese-web:
     image: toposoid/toposoid-common-nlp-japanese-web:0.5-SNAPSHOT
     environment:
@@ -36,6 +56,15 @@ services:
       - PLAY_HTTP_PORT=9006
     ports:
       - 9006:9006
+  toposoid-sentence-parser-english-web:
+    image: toposoid/toposoid-sentence-parser-english-web:0.5-SNAPSHOT
+    environment:
+      - PRIVATE_IP_ADDRESS=toposoid-sentence-parser-english-web
+      - PLAY_HTTP_PORT=9007
+      - TOPOSOID_CORENLP_HOST=corenlp
+      - TOPOSOID_PARSER_SPACY_MODEL_EN=en_core_web_lg
+    ports:
+      - 9007:9007
   toposoid-common-nlp-english-web:
     image: toposoid/toposoid-common-nlp-english-web:0.5-SNAPSHOT
     environment:
@@ -49,16 +78,10 @@ services:
       - PLAY_HTTP_PORT=9008
     ports:
       - 9008:9008
-  scala-data-accessor-neo4j-web:
-    image: toposoid/scala-data-accessor-neo4j-web:0.5-SNAPSHOT
-    environment:
-      - PRIVATE_IP_ADDRESS=scala-data-accessor-neo4j-web
-      - TOPOSOID_GRAPHDB_HOST=neo4j
-      - PLAY_HTTP_PORT=9005
+  corenlp:
+    image: toposoid/corenlp:3.4.2
     ports:
-      - 9005:9005
-    depends_on:
-      - neo4j
+      - 9000:9000
   neo4j:
     image: neo4j:4.4.23
     ports:
@@ -76,6 +99,23 @@ services:
       - NEO4J_dbms_allow__upgrade=true
       - NEO4J_dbms_default__database=neo4j
       - NEO4J_AUTH=neo4j/p@ssw0rd
+
+  toposoid-contents-admin-web:
+    image: toposoid/toposoid-contents-admin-web:0.5-SNAPSHOT
+    environment:
+      - TOPOSOID_CONTENTS_URL=http://toposoid-contents-admin-web:9012/contents/
+    ports:
+      - 9012:9012
+
+  toposoid-common-image-recognition-web:
+    image: toposoid/toposoid-common-image-recognition-web:0.5-SNAPSHOT
+    environment:
+      - TOPOSOID_IMAGE_RECOGNITION_VIT_MODEL=google/vit-base-patch16-224
+      - TOPOSOID_IMAGE_RECOGNITION_MOBILE_VIT_MODEL=apple/mobilevit-small
+      - TOPOSOID_IMAGE_RECOGNITION_MOBILE_VIT_USE=1
+    ports:
+      - 9013:9013
+
   data-accessor-sentence-weaviate-web:
     image: toposoid/data-accessor-weaviate-web:0.5-SNAPSHOT
     environment:
@@ -142,6 +182,3 @@ services:
       HUGGINGFACE_APIKEY: ''
       ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
       CLUSTER_HOSTNAME: 'node1'
-
-
-
