@@ -16,7 +16,7 @@
 
 package controllers
 
-import com.ideal.linked.toposoid.common.{IMAGE, MANUAL, ToposoidUtils}
+import com.ideal.linked.toposoid.common.{CLAIM, IMAGE, MANUAL, PREMISE, SENTENCE, ToposoidUtils}
 import com.ideal.linked.toposoid.knowledgebase.regist.model.{ImageReference, Knowledge, KnowledgeForImage, PropositionRelation, Reference}
 import com.ideal.linked.common.DeploymentConverter.conf
 import com.ideal.linked.toposoid.knowledgebase.featurevector.model.{FeatureVectorIdentifier, RegistContentResult}
@@ -85,7 +85,8 @@ object TestUtils extends LazyLogging {
         } catch {
           case e: Exception => {
             logger.error(e.toString, e)
-            knowledgeSentenceSetForParser.premiseList.map(x => deleteFeatureVector(x.propositionId, x.knowledge))
+            knowledgeSentenceSetForParser.premiseList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, PREMISE.index, x.knowledge))
+            knowledgeSentenceSetForParser.claimList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, CLAIM.index, x.knowledge))
           }
         }
         if (check) b.break
@@ -93,13 +94,19 @@ object TestUtils extends LazyLogging {
     }
   }
 
-  def deleteFeatureVector(propositionId:String, knowledge: Knowledge)={
+  def deleteFeatureVector(propositionId:String, sentenceId:String, sentenceType:Int, knowledge: Knowledge)={
+
+    val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = sentenceId, sentenceType = sentenceType, lang = knowledge.lang)
+    val json = Json.toJson(featureVectorIdentifier).toString()
+    ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "delete")
+
     knowledge.knowledgeForImages.map(x => {
-      val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = x.id, sentenceType = IMAGE.index, lang = knowledge.lang)
-      val json = Json.toJson(featureVectorIdentifier).toString()
-      ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "delete")
-      Thread.sleep(5000)
+      val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = x.id, sentenceType = sentenceType, lang = knowledge.lang)
+      val json2 = Json.toJson(featureVectorIdentifier).toString()
+      ToposoidUtils.callComponent(json2, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "delete")
     })
+    Thread.sleep(5000)
+
   }
 
   def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage]): String = {
