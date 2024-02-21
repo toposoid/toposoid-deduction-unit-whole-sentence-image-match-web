@@ -70,6 +70,10 @@ object TestUtils extends LazyLogging {
       List(knowledgeForParser),
       List.empty[PropositionRelation])
     Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
+    createVector(knowledgeSentenceSetForParser)
+  }
+
+  def createVector(knowledgeSentenceSetForParser: KnowledgeSentenceSetForParser): Unit = {
     val b = new Breaks
     import b.{break, breakable}
     var check = false
@@ -87,7 +91,6 @@ object TestUtils extends LazyLogging {
       }
     }
   }
-
 
   def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage]): String = {
     /**

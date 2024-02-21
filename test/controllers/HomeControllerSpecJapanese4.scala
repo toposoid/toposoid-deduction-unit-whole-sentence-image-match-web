@@ -378,7 +378,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
         List(KnowledgeForParser(propositionId3, sentenceId5, knowledge3), KnowledgeForParser(propositionId3, sentenceId6, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
       Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
-      FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+      createVector(knowledgeSentenceSetForParser)
       Thread.sleep(5000)
 
 
@@ -476,7 +476,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
         List(KnowledgeForParser(propositionId2, sentenceId4, knowledge3), KnowledgeForParser(propositionId2, sentenceId5, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
       Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
-      FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+      createVector(knowledgeSentenceSetForParser)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
@@ -527,7 +527,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
         List(KnowledgeForParser(propositionId2, sentenceId4, knowledge3a), KnowledgeForParser(propositionId2, sentenceId5, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
       Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
-      FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+      createVector(knowledgeSentenceSetForParser)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
@@ -583,7 +583,7 @@ class HomeControllerSpecJapanese4 extends PlaySpec with BeforeAndAfter with Befo
         List(KnowledgeForParser(propositionId3, sentenceId5, knowledge3a), KnowledgeForParser(propositionId3, sentenceId6, knowledge4)),
         List(PropositionRelation("AND", 0,1)))
       Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
-      FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+      createVector(knowledgeSentenceSetForParser)
       Thread.sleep(5000)
 
       val propositionIdForInference = getUUID()
