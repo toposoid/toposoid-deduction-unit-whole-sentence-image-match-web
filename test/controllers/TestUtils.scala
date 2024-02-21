@@ -25,12 +25,15 @@ import com.ideal.linked.toposoid.protocol.model.base.{AnalyzedSentenceObject, An
 import com.ideal.linked.toposoid.protocol.model.parser.{KnowledgeForParser, KnowledgeSentenceSetForParser}
 import com.ideal.linked.toposoid.sentence.transformer.neo4j.Sentence2Neo4jTransformer
 import com.ideal.linked.toposoid.vectorizer.FeatureVectorizer
+import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.Json
 import io.jvm.uuid.UUID
 
+import scala.util.control.Breaks
+
 case class ImageBoxInfo(x:Int, y:Int, weight:Int, height:Int)
 
-object TestUtils {
+object TestUtils extends LazyLogging {
 
   var usedUuidList = List.empty[String]
 
@@ -67,8 +70,24 @@ object TestUtils {
       List(knowledgeForParser),
       List.empty[PropositionRelation])
     Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser)
-    FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+    val b = new Breaks
+    import b.{break, breakable}
+    var check = false
+    breakable {
+      for (i <- 0 to 3) {
+        try {
+          FeatureVectorizer.createVector(knowledgeSentenceSetForParser)
+          check = true
+        } catch {
+          case e: Exception => {
+            logger.error(e.toString, e)
+          }
+        }
+        if (check) b.break
+      }
+    }
   }
+
 
   def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage]): String = {
     /**
