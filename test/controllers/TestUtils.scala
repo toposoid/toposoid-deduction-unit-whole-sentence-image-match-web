@@ -19,7 +19,7 @@ package controllers
 import com.ideal.linked.toposoid.common.{IMAGE, MANUAL, ToposoidUtils}
 import com.ideal.linked.toposoid.knowledgebase.regist.model.{ImageReference, Knowledge, KnowledgeForImage, PropositionRelation, Reference}
 import com.ideal.linked.common.DeploymentConverter.conf
-import com.ideal.linked.toposoid.knowledgebase.featurevector.model.RegistContentResult
+import com.ideal.linked.toposoid.knowledgebase.featurevector.model.{FeatureVectorIdentifier, RegistContentResult}
 import com.ideal.linked.toposoid.knowledgebase.model.{KnowledgeBaseNode, KnowledgeBaseSemiGlobalNode, KnowledgeFeatureReference, LocalContext, LocalContextForFeature}
 import com.ideal.linked.toposoid.protocol.model.base.{AnalyzedSentenceObject, AnalyzedSentenceObjects}
 import com.ideal.linked.toposoid.protocol.model.parser.{KnowledgeForParser, KnowledgeSentenceSetForParser}
@@ -85,11 +85,21 @@ object TestUtils extends LazyLogging {
         } catch {
           case e: Exception => {
             logger.error(e.toString, e)
+            knowledgeSentenceSetForParser.premiseList.map(x => deleteFeatureVector(x.propositionId, x.knowledge))
           }
         }
         if (check) b.break
       }
     }
+  }
+
+  def deleteFeatureVector(propositionId:String, knowledge: Knowledge)={
+    knowledge.knowledgeForImages.map(x => {
+      val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = x.id, sentenceType = IMAGE.index, lang = knowledge.lang)
+      val json = Json.toJson(featureVectorIdentifier).toString()
+      ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "delete")
+      Thread.sleep(5000)
+    })
   }
 
   def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage]): String = {
