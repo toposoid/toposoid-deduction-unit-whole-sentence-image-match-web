@@ -47,11 +47,11 @@ object TestUtils extends LazyLogging {
   }
 
 
-  def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo): Knowledge = {
-    Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo)))
+  def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): Knowledge = {
+    Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo, transversalState)))
   }
 
-  def getImageInfo(reference: Reference, imageBoxInfo: ImageBoxInfo): KnowledgeForImage = {
+  def getImageInfo(reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): KnowledgeForImage = {
     val imageReference = ImageReference(reference: Reference, imageBoxInfo.x, imageBoxInfo.y, imageBoxInfo.weight, imageBoxInfo.height)
     val knowledgeForImage = KnowledgeForImage(id = getUUID(), imageReference = imageReference)
     val registContentResultJson = ToposoidUtils.callComponent(
@@ -59,35 +59,35 @@ object TestUtils extends LazyLogging {
       conf.getString("TOPOSOID_CONTENTS_ADMIN_HOST"),
       conf.getString("TOPOSOID_CONTENTS_ADMIN_PORT"),
       "registImage",
-      TransversalState(username="guest"))
+      transversalState)
     val registContentResult: RegistContentResult = Json.parse(registContentResultJson).as[RegistContentResult]
     registContentResult.knowledgeForImage
   }
 
-  def registSingleClaim(knowledgeForParser: KnowledgeForParser): Unit = {
+  def registSingleClaim(knowledgeForParser: KnowledgeForParser, transversalState:TransversalState): Unit = {
     val knowledgeSentenceSetForParser = KnowledgeSentenceSetForParser(
       List.empty[KnowledgeForParser],
       List.empty[PropositionRelation],
       List(knowledgeForParser),
       List.empty[PropositionRelation])
-    Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser, TransversalState(username="guest"))
-    createVector(knowledgeSentenceSetForParser)
+    Sentence2Neo4jTransformer.createGraph(knowledgeSentenceSetForParser, transversalState)
+    createVector(knowledgeSentenceSetForParser, transversalState)
   }
 
-  def createVector(knowledgeSentenceSetForParser: KnowledgeSentenceSetForParser): Unit = {
+  def createVector(knowledgeSentenceSetForParser: KnowledgeSentenceSetForParser, transversalState:TransversalState): Unit = {
     val b = new Breaks
     import b.{break, breakable}
     var check = false
     breakable {
       for (i <- 0 to 3) {
         try {
-          FeatureVectorizer.createVector(knowledgeSentenceSetForParser, TransversalState(username="guest"))
+          FeatureVectorizer.createVector(knowledgeSentenceSetForParser, transversalState)
           check = true
         } catch {
           case e: Exception => {
             logger.error(e.toString, e)
-            knowledgeSentenceSetForParser.premiseList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, PREMISE.index, x.knowledge))
-            knowledgeSentenceSetForParser.claimList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, CLAIM.index, x.knowledge))
+            knowledgeSentenceSetForParser.premiseList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, PREMISE.index, x.knowledge, transversalState))
+            knowledgeSentenceSetForParser.claimList.map(x => deleteFeatureVector(x.propositionId, x.sentenceId, CLAIM.index, x.knowledge, transversalState))
           }
         }
         if (check) b.break
@@ -95,28 +95,28 @@ object TestUtils extends LazyLogging {
     }
   }
 
-  def deleteFeatureVector(propositionId:String, sentenceId:String, sentenceType:Int, knowledge: Knowledge)={
+  def deleteFeatureVector(propositionId:String, sentenceId:String, sentenceType:Int, knowledge: Knowledge, transversalState:TransversalState)={
 
     val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = sentenceId, sentenceType = sentenceType, lang = knowledge.lang)
     val json = Json.toJson(featureVectorIdentifier).toString()
-    ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "delete", TransversalState(username="guest"))
+    ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "delete", transversalState)
 
     knowledge.knowledgeForImages.map(x => {
       val featureVectorIdentifier = FeatureVectorIdentifier(propositionId = propositionId, featureId = x.id, sentenceType = sentenceType, lang = knowledge.lang)
       val json2 = Json.toJson(featureVectorIdentifier).toString()
-      ToposoidUtils.callComponent(json2, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "delete", TransversalState(username="guest"))
+      ToposoidUtils.callComponent(json2, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "delete", transversalState)
     })
     Thread.sleep(5000)
 
   }
 
-  def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage]): String = {
+  def addImageInfoToAnalyzedSentenceObjects(lang:String,inputSentence: String, knowledgeForImages: List[KnowledgeForImage], transversalState:TransversalState): String = {
     /**
      * CAUTION This function does not support cases where one node has multiple images!!!
      */
     val json = lang match {
-      case "ja_JP" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT"), "analyze", TransversalState(username="guest"))
-      case "en_US" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_PORT"), "analyze", TransversalState(username="guest"))
+      case "ja_JP" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_JP_WEB_PORT"), "analyze", transversalState)
+      case "en_US" => ToposoidUtils.callComponent(inputSentence, conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_HOST"), conf.getString("TOPOSOID_SENTENCE_PARSER_EN_WEB_PORT"), "analyze", transversalState)
     }
 
     val asos: AnalyzedSentenceObjects = Json.parse(json).as[AnalyzedSentenceObjects]
