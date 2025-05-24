@@ -134,7 +134,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     (featureVectorSearchResult.ids zip featureVectorSearchResult.similarities).foldLeft(List.empty[FeatureVectorSearchInfo]) {
       (acc, x) => {
         val idInfo = x._1
-        val propositionId = idInfo.propositionId
+        val propositionId = idInfo.superiorId
         val lang = idInfo.lang
         val featureId = idInfo.featureId
         val similarity = x._2
