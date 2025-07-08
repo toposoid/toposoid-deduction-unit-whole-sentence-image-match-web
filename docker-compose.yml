@@ -1,10 +1,10 @@
 version: '3'
 services:
   toposoid-deduction-unit-whole-sentence-image-match-web:
-    image: toposoid/toposoid-deduction-unit-whole-sentence-image-match-web:0.6-SNAPSHOT-lowspec
+    image: toposoid/toposoid-deduction-unit-whole-sentence-image-match-web:0.6-SNAPSHOT
     environment:
       - PRIVATE_IP_ADDRESS=localhost
-      - TOPOSOID_GRAPHDB_WEB_HOST=scala-data-accessor-neo4j-web
+      - TOPOSOID_GRAPHDB_WEB_HOST=data-accessor-neo4j-web
       - TOPOSOID_GRAPHDB_WEB_PORT=9005
       - TOPOSOID_COMMON_NLP_JP_WEB_HOST=toposoid-common-nlp-japanese-web
       - TOPOSOID_COMMON_NLP_JP_WEB_PORT=9006
@@ -21,16 +21,16 @@ services:
       - PLAY_HTTP_PORT=9105
     ports:
       - 9105:9105
-  scala-data-accessor-neo4j-web:
-    image: toposoid/scala-data-accessor-neo4j-web:0.6-SNAPSHOT-lowspec
+  data-accessor-neo4j-web:
+    image: toposoid/data-accessor-neo4j-web:0.6-SNAPSHOT
     environment:
-      - PRIVATE_IP_ADDRESS=scala-data-accessor-neo4j-web
+      - PRIVATE_IP_ADDRESS=data-accessor-neo4j-web
       - TOPOSOID_GRAPHDB_HOST=neo4j
       - PLAY_HTTP_PORT=9005
     ports:
       - 9005:9005
   toposoid-knowledge-register-web:
-    image: toposoid/toposoid-knowledge-register-web:0.6-SNAPSHOT-lowspec
+    image: toposoid/toposoid-knowledge-register-web:0.6-SNAPSHOT
     environment:
       - PRIVATE_IP_ADDRESS=localhost
       - TOPOSOID_GRAPHDB_HOST=neo4j
@@ -54,7 +54,7 @@ services:
     ports:
       - 9002:9002
   toposoid-sentence-parser-japanese-web:
-    image: toposoid/toposoid-sentence-parser-japanese-web:0.6-SNAPSHOT-lowspec
+    image: toposoid/toposoid-sentence-parser-japanese-web:0.6-SNAPSHOT
     environment:
       - PRIVATE_IP_ADDRESS=toposoid-sentence-parser-japanese-web
       - PLAY_HTTP_PORT=9001
@@ -86,7 +86,7 @@ services:
     image: toposoid/toposoid-common-nlp-english-web:0.6-SNAPSHOT-lowspec
     environment:
       - PRIVATE_IP_ADDRESS=toposoid-common-nlp-english-web
-      - TOPOSOID_SYNONYM_NOUN_SIMILARITY_THRESHHOLD_EN=0.52
+      - TOPOSOID_SYNONYM_NOUN_SIMILARITY_THRESHHOLD_EN=0.34
       - TOPOSOID_SYNONYM_VERB_SIMILARITY_THRESHHOLD_EN=0.52
       - TOPOSOID_WORD2VEC_SIMILARITY_THRESHHOLD_EN=0.78
       - TOPOSOID_SPACY_MODEL_EN=en_core_web_md
