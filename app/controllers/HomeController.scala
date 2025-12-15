@@ -31,6 +31,7 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import play.api.libs.json.{Json, __}
+import play.api.libs.json.JsValue
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -42,7 +43,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    *
    * @return
    */
-  def execute() = Action(parse.json) { request =>
+  def execute():Action[JsValue] = Action(parse.json[JsValue])  { request =>
     val transversalState = Json.parse(request.headers.get(TRANSVERSAL_STATE .str).get).as[TransversalState]
     try {
       val json = request.body
