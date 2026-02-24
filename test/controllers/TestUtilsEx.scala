@@ -17,7 +17,7 @@
 
 package controllers
 
-import com.ideal.linked.toposoid.common.{CLAIM, IMAGE, MANUAL, Neo4JUtilsImpl, PREMISE, SENTENCE, ToposoidUtils, TransversalState}
+import com.ideal.linked.toposoid.common.{FeatureType, DataEntryType,  Neo4JUtilsImpl, ToposoidUtils, TransversalState}
 import com.ideal.linked.toposoid.knowledgebase.regist.model.{ImageReference, Knowledge, KnowledgeForImage, PropositionRelation, Reference}
 import com.ideal.linked.common.DeploymentConverter.conf
 import com.ideal.linked.toposoid.knowledgebase.featurevector.model.{FeatureVectorIdentifier, RegistContentResult}
@@ -118,10 +118,10 @@ object TestUtilsEx extends LazyLogging {
           propositionId = x.knowledgeBaseSemiGlobalNode.propositionId,
           sentenceId = x.knowledgeBaseSemiGlobalNode.sentenceId,
           featureId = getUUID(),
-          featureType = IMAGE.index,
+          featureType = FeatureType.IMAGE.index,
           url = knowledgeForImage.imageReference.reference.url,
           source = knowledgeForImage.imageReference.reference.originalUrlOrReference,
-          featureInputType = MANUAL.index,
+          featureInputType = DataEntryType.MANUAL.index,
           extentText = "{}")
 
         val localContextForFeature = LocalContextForFeature(
