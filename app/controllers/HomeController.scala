@@ -18,7 +18,7 @@
 package controllers
 
 import com.ideal.linked.common.DeploymentConverter.conf
-import com.ideal.linked.toposoid.common.{CLAIM, IMAGE, SEMIGLOBAL, TRANSVERSAL_STATE, ToposoidUtils, TransversalState}
+import com.ideal.linked.toposoid.common.{SentenceType, FeatureType, ScopeType, TRANSVERSAL_STATE, ToposoidUtils, TransversalState}
 import com.ideal.linked.toposoid.deduction.common.FacadeForAccessNeo4J.getCypherQueryResult
 import com.ideal.linked.toposoid.deduction.common.{DeductionUnitControllerForSemiGlobal, FeatureVectorSearchInfo}
 import com.ideal.linked.toposoid.knowledgebase.featurevector.model.{FeatureVectorIdentifier, FeatureVectorSearchResult, SingleFeatureVectorForSearch}
@@ -51,7 +51,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
       val asos: List[AnalyzedSentenceObject] = analyzedSentenceObjects.analyzedSentenceObjects
 
       val result: List[AnalyzedSentenceObject] = asos.foldLeft(List.empty[AnalyzedSentenceObject]) {
-        (acc, x) => acc :+ analyze(x, acc, "whole-sentence-image-feature-match", List(IMAGE.index), transversalState)
+        (acc, x) => acc :+ analyze(x, acc, "whole-sentence-image-feature-match", List(FeatureType.IMAGE.index), transversalState)
       }
       //Check if the image exists on asos here　or not.
       logger.info(ToposoidUtils.formatMessageForLogger("deduction completed.", transversalState.userId))
@@ -105,7 +105,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     val (ids, similarities) = (result.ids zip result.similarities).foldLeft((List.empty[FeatureVectorIdentifier], List.empty[Float])) {
       (acc, x) => {
         x._1.sentenceType match {
-          case CLAIM.index => (acc._1 :+ x._1, acc._2 :+ x._2)
+          case SentenceType.CLAIM.index => (acc._1 :+ x._1, acc._2 :+ x._2)
           case _ => acc
         }
       }
@@ -140,7 +140,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         val lang = idInfo.lang
         val featureId = idInfo.featureId
         val similarity = x._2
-        val nodeType: String = ToposoidUtils.getNodeType(idInfo.sentenceType, SEMIGLOBAL.index, IMAGE.index)
+        val nodeType: String = ToposoidUtils.getNodeType(idInfo.sentenceType, ScopeType.SEMIGLOBAL.index, FeatureType.IMAGE.index)
         //Check whether featureVectorSearchResult information exists in Neo4J
         val query = "MATCH (n:%s) WHERE n.propositionId='%s' AND n.featureId='%s' RETURN n".format(nodeType, propositionId, featureId)
         val jsonStr: String = getCypherQueryResult(query, "", transversalState)
