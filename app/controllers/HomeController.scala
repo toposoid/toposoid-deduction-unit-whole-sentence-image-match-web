@@ -57,14 +57,6 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
       val json = request.body
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(json.toString).as[AnalyzedSentenceObjects]
       val asos: List[AnalyzedSentenceObject] = analyzedSentenceObjects.analyzedSentenceObjects
-      /*
-      val result: List[AnalyzedSentenceObject] = asos.foldLeft(List.empty[AnalyzedSentenceObject]) {
-        (acc, x) => acc :+ analyze(x, acc, "whole-sentence-image-feature-match", List(FeatureType.IMAGE.index), transversalState)
-      }
-      //Check if the image exists on asos here　or not.
-      logger.info(ToposoidUtils.formatMessageForLogger("deduction completed.", transversalState.userId))
-      Ok(Json.toJson(AnalyzedSentenceObjects(result))).as(JSON)
-      */
       val result:List[VerifyingEdges] = asos.foldLeft(List.empty[VerifyingEdges]){
         (acc, aso) => {    
           acc :+ VerifyingEdges(            
@@ -94,215 +86,22 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
     aso.knowledgeBaseSemiGlobalNode.localContextForFeature.knowledgeFeatureReferences.foldLeft(List.empty[CoveredPropositionEdge]) {
       (acc, x) => {
-        val featureVectorSearchResult = getFeatureVectorSearchResult(FeatureType.IMAGE, aso.knowledgeBaseSemiGlobalNode.sentenceType, "", "",  x.url, transversalState)
+        val featureVectorSearchResult = FeatureVectorizer.getFeatureVectorSearchResult(FeatureType.IMAGE,  "", "",  x.url, transversalState)        
+        val sentenceIds = aso.deductionResult.coveredPropositionEdges.foldLeft(List.empty[String]){
+          (acc, x) =>
+            acc ++ x.sourceNode.matchedKnowledgeNodes.map(y => "'" + y.sentenceId + "'")
+        }.distinct
+
+        //TODO: sentenceIdsに限定して、featureVectorSearchResultが存在するかを確認する。
+
         featureVectorSearchResult.ids.size match {
           case 0 => acc
-          case _ => acc  ::: getCoveredPropositionEdges(aso, featureVectorSearchResult, transversalState)
-        }
-        /*
-        val imageFeatures: List[CoveredPropositionEdge] = getMatchedImageFeature(
-          aso.knowledgeBaseSemiGlobalNode.sentenceType,
-          x.url,
-          transversalState
-        )
-        imageFeatures.size match {
-          case 0 => acc
-          case _ => acc ::: imageFeatures
-        }
-        */
-      }
-    }
-  }
-
-  //TODO toposoid-feature-vectorizer へ移動 featureTypeを持たせる。
-  private def getFeatureVectorSearchResult(featureType:FeatureType,  originalSentenceType: Int, sentence:String, lang:String, url:String, transversalState:TransversalState): FeatureVectorSearchResult = {
-
-    val featureVectorSearchResultJson = featureType match {
-      case FeatureType.SENTENCE => {
-        val vector = FeatureVectorizer.getSentenceVector(Knowledge(sentence, lang, "{}"), transversalState)
-        val json: String = Json.toJson(SingleFeatureVectorForSearch(vector = vector.vector, num = conf.getString("TOPOSOID_SENTENCE_VECTORDB_SEARCH_NUM_MAX").toInt)).toString()
-        ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_SENTENCE_VECTORDB_ACCESSOR_PORT"), "search", transversalState)
-      }
-      case FeatureType.IMAGE => {
-        val vector = FeatureVectorizer.getImageVector(url, transversalState)
-        val json: String = Json.toJson(SingleFeatureVectorForSearch(vector = vector.vector, num = conf.getString("TOPOSOID_IMAGE_VECTORDB_SEARCH_NUM_MAX").toInt)).toString()
-        ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "search", transversalState)
-      }
-      case FeatureType.TABLE => {
-        //TODO:Implement
-        Json.toJson(FeatureVectorSearchResult(List.empty[FeatureVectorIdentifier], List.empty[Float], StatusInfo("Ok", ""))).toString
-      } 
-      case _ => {
-        Json.toJson(FeatureVectorSearchResult(List.empty[FeatureVectorIdentifier], List.empty[Float], StatusInfo("Ok", ""))).toString
-      }
-    }
-
-    Json.parse(featureVectorSearchResultJson).as[FeatureVectorSearchResult]
-
-  }
-  
-  private def getCoveredPropositionEdges(aso:AnalyzedSentenceObject ,featureVectorSearchResult: FeatureVectorSearchResult, transversalState:TransversalState): List[CoveredPropositionEdge] = {
-
-    val (ids, similarities) = (featureVectorSearchResult.ids zip featureVectorSearchResult.similarities).foldLeft((List.empty[FeatureVectorIdentifier], List.empty[Float])) {
-      (acc, x) => {
-        x._1.sentenceType match {
-          case SentenceType.CLAIM.index => (acc._1 :+ x._1, acc._2 :+ x._2)
-          case _ => acc
-        }
-      }
-    }
-
-    val filteredResult = FeatureVectorSearchResult(ids, similarities, featureVectorSearchResult.statusInfo) 
-    val deductionUnitName = conf.getString("TOPOSOID_DEDUCTION_UNIT_NAME")
-    filteredResult.ids.size match {
-      case 0 => List.empty[CoveredPropositionEdge]
-      case _ => {        
-        val featureVectorSearchInfoList = DeductionUtilsForSemiGlobal.extractExistInNeo4JResultForSentence(filteredResult, aso.knowledgeBaseSemiGlobalNode.sentenceType, transversalState)        
-        val matchedKnowledgeNodes = featureVectorSearchInfoList.map(x => {
-          MatchedKnowledgeNode(
-            propositionId = x.propositionId,
-            sentenceId = x.sentenceId,
-            nodeId = "",
-            caseNameOnEdge = "",
-            isDenialWord = false,
-            nodeType = x.sentenceType,
-            featureInfo = MatchedFeatureInfo(featureId = x.featureId, similarity = x.similarity)
-          )          
-        })
-
-        aso.edgeList.map(x => {
-          val sourceNode = aso.nodeMap.get(x.sourceId).get.asInstanceOf[KnowledgeBaseNode]
-          val destinationNode = aso.nodeMap.get(x.destinationId).get.asInstanceOf[KnowledgeBaseNode]
-          val sourceCoveredPropositionNode = CoveredPropositionNode(
-            terminalId = sourceNode.nodeId,
-            terminalSurface = sourceNode.predicateArgumentStructure.surface,
-            terminalUrl = "",
-            matchedKnowledgeNodes = matchedKnowledgeNodes,
-            isConfirmed = true,
-            deductionUnit = deductionUnitName
-          )
-
-          val destinationCoveredPropositionNode = CoveredPropositionNode(
-            terminalId = destinationNode.nodeId,
-            terminalSurface = destinationNode.predicateArgumentStructure.surface,
-            terminalUrl = "",
-            matchedKnowledgeNodes = matchedKnowledgeNodes,
-            isConfirmed = true,
-            deductionUnit = deductionUnitName
-          )
-          CoveredPropositionEdge(sourceCoveredPropositionNode, destinationCoveredPropositionNode)
-        }) 
-      }
-    }    
-      
-    List.empty[CoveredPropositionEdge]
-  }
-
-
-  /**
-   *
-   * @param originalSentenceType
-   * @param url
-   * @return
-   */
-  /*
-  private def getMatchedImageFeature(originalSentenceType: Int, url:String, transversalState:TransversalState): List[CoveredPropositionEdge] = {
-    /*
-    val vector = FeatureVectorizer.getImageVector(url, transversalState)
-    val json: String = Json.toJson(SingleFeatureVectorForSearch(vector = vector.vector, num = conf.getString("TOPOSOID_IMAGE_VECTORDB_SEARCH_NUM_MAX").toInt)).toString()
-    val featureVectorSearchResultJson: String = ToposoidUtils.callComponent(json, conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_HOST"), conf.getString("TOPOSOID_IMAGE_VECTORDB_ACCESSOR_PORT"), "search", transversalState)
-    val result = Json.parse(featureVectorSearchResultJson).as[FeatureVectorSearchResult]
-    */
-
-    //TODO:Sentenceも一致しているかどうかチェックするか？　環境変数で設定できると良いのかも
-    //VecotrDBにClaimとして存在している場合に推論が可能になる
-    val (ids, similarities) = (result.ids zip result.similarities).foldLeft((List.empty[FeatureVectorIdentifier], List.empty[Float])) {
-      (acc, x) => {
-        x._1.sentenceType match {
-          case SentenceType.CLAIM.index => (acc._1 :+ x._1, acc._2 :+ x._2)
-          case _ => acc
-        }
-      }
-    }
-
-    val filteredResult = FeatureVectorSearchResult(ids, similarities, result.statusInfo) 
-    val deductionUnitName = conf.getString("TOPOSOID_DEDUCTION_UNIT_NAME")
-    filteredResult.ids.size match {
-      case 0 => List.empty[CoveredPropositionEdge]
-      case _ => {        
-        val featureVectorSearchInfoList = DeductionUtilsForSemiGlobal.extractExistInNeo4JResultForSentence(filteredResult, originalSentenceType, transversalState)        
-        val matchedKnowledgeNodes = featureVectorSearchInfoList.map(x => {
-          MatchedKnowledgeNode(
-            propositionId = x.propositionId,
-            sentenceId = x.sentenceId,
-            nodeId = "",
-            caseNameOnEdge = "",
-            isDenialWord = false,
-            nodeType = x.sentenceType,
-            featureInfo = MatchedFeatureInfo(featureId = x.featureId, similarity = x.similarity)
-          )          
-        })
-
-        aso.edgeList.map(x => {
-          val sourceNode = aso.nodeMap.get(x.sourceId).get.asInstanceOf[KnowledgeBaseNode]
-          val destinationNode = aso.nodeMap.get(x.destinationId).get.asInstanceOf[KnowledgeBaseNode]
-          val sourceCoveredPropositionNode = CoveredPropositionNode(
-            terminalId = sourceNode.nodeId,
-            terminalSurface = sourceNode.predicateArgumentStructure.surface,
-            terminalUrl = "",
-            matchedKnowledgeNodes = matchedKnowledgeNodes,
-            isConfirmed = true,
-            deductionUnit = deductionUnitName
-          )
-
-          val destinationCoveredPropositionNode = CoveredPropositionNode(
-            terminalId = destinationNode.nodeId,
-            terminalSurface = destinationNode.predicateArgumentStructure.surface,
-            terminalUrl = "",
-            matchedKnowledgeNodes = matchedKnowledgeNodes,
-            isConfirmed = true,
-            deductionUnit = deductionUnitName
-          )
-          CoveredPropositionEdge(sourceCoveredPropositionNode, destinationCoveredPropositionNode)
-        }) 
-      }
-    }    
-        
-  
-
-  }
-  */
-  /**
-   *
-   * @param featureVectorSearchResult
-   * @param originalSentenceType
-   * @return
-   */
-  /*
-  private def extractExistInNeo4JResultForImage(featureVectorSearchResult: FeatureVectorSearchResult, originalSentenceType: Int, transversalState:TransversalState): List[FeatureVectorSearchInfo] = {
-
-    (featureVectorSearchResult.ids zip featureVectorSearchResult.similarities).foldLeft(List.empty[FeatureVectorSearchInfo]) {
-      (acc, x) => {
-        val idInfo = x._1
-        val propositionId = idInfo.superiorId
-        val lang = idInfo.lang
-        val featureId = idInfo.featureId
-        val similarity = x._2
-        val nodeType: String = ToposoidUtils.getNodeType(idInfo.sentenceType, ScopeType.SEMIGLOBAL.index, FeatureType.IMAGE.index)
-        //Check whether featureVectorSearchResult information exists in Neo4J
-        val query = "MATCH (n:%s) WHERE n.propositionId='%s' AND n.featureId='%s' RETURN n".format(nodeType, propositionId, featureId)
-        val jsonStr: String = getCypherQueryResult(query, "", transversalState)
-        val neo4jRecords: Neo4jRecords = Json.parse(jsonStr).as[Neo4jRecords]
-        neo4jRecords.records.size match {
-          case 0 => acc
           case _ => {
-            val idInfoOnNeo4jSide = neo4jRecords.records.head.head.value.featureNode.get
-            //sentenceType returns the originalSentenceType of the argument
-            acc :+ FeatureVectorSearchInfo(idInfoOnNeo4jSide.propositionId, idInfoOnNeo4jSide.sentenceId, originalSentenceType, lang, featureId, similarity)
+            acc  ::: DeductionUtilsForSemiGlobal.getCoveredPropositionEdges(true, aso, featureVectorSearchResult, transversalState)
           }
         }
       }
     }
   }
-  */
+
 }
