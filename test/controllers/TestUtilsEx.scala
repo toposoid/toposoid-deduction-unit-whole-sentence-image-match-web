@@ -68,9 +68,13 @@ object TestUtilsEx extends LazyLogging {
     uuid
   }
 
-
+  
   def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): Knowledge = {
     Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo, transversalState)))
+  }
+  
+  def getKnowledge2(lang:String, sentence: String, imageInfoList:List[(Reference, ImageBoxInfo)],transversalState: TransversalState): Knowledge = {
+    Knowledge(sentence, lang, "{}", false, getImageInfo2(imageInfoList, transversalState))
   }
 
   def getImageInfo2(imageInfoList:List[(Reference, ImageBoxInfo)], transversalState: TransversalState): List[KnowledgeForImage] = {
@@ -91,8 +95,6 @@ object TestUtilsEx extends LazyLogging {
     })
   }
 
-
-
   def getImageInfo(reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): KnowledgeForImage = {
     val imageReference = ImageReference(reference: Reference, imageBoxInfo.x, imageBoxInfo.y, imageBoxInfo.weight, imageBoxInfo.height)
     val knowledgeForImage = KnowledgeForImage(id = getUUID(), imageReference = imageReference)
@@ -105,6 +107,7 @@ object TestUtilsEx extends LazyLogging {
     val registContentResult: RegistContentResult = Json.parse(registContentResultJson).as[RegistContentResult]
     registContentResult.knowledgeForImage
   }
+  
   /*
   def deleteFeatureVector(propositionId:String, sentenceId:String, sentenceType:Int, knowledge: Knowledge, transversalState:TransversalState)={
 
