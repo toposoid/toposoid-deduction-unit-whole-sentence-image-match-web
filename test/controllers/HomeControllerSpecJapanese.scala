@@ -36,6 +36,8 @@ import play.api.test._
 
 import scala.concurrent.duration.DurationInt
 import com.ideal.linked.toposoid.common.ActionModeType
+import com.ideal.linked.toposoid.protocol.model.base.VerifyingEdges
+import controllers.TestUtilsEx.getImageInfo2
 
 class HomeControllerSpecJapanese extends PlaySpec with BeforeAndAfter with BeforeAndAfterAll with GuiceOneAppPerSuite with DefaultAwaitTimeout with Injecting {
 
@@ -144,7 +146,7 @@ class HomeControllerSpecJapanese extends PlaySpec with BeforeAndAfter with Befor
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ok, imageBoxInfoPara2Ok)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnit(json, transversalState)
+      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))

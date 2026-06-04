@@ -28,6 +28,8 @@ import com.ideal.linked.toposoid.protocol.model.parser.{KnowledgeForParser, Know
 import com.ideal.linked.toposoid.test.utils.TestUtils
 import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.Json
+import com.ideal.linked.toposoid.protocol.model.base.VerifyingEdges
+import com.ideal.linked.toposoid.protocol.model.base.DeductionResult
 //import io.jvm.uuid.UUID
 
 
@@ -70,6 +72,26 @@ object TestUtilsEx extends LazyLogging {
   def getKnowledge(lang:String, sentence: String, reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): Knowledge = {
     Knowledge(sentence, lang, "{}", false, List(getImageInfo(reference, imageBoxInfo, transversalState)))
   }
+
+  def getImageInfo2(imageInfoList:List[(Reference, ImageBoxInfo)], transversalState: TransversalState): List[KnowledgeForImage] = {
+
+    imageInfoList.map(x => {
+      val reference = x._1
+      val imageBoxInfo = x._2
+      val imageReference = ImageReference(reference: Reference, imageBoxInfo.x, imageBoxInfo.y, imageBoxInfo.weight, imageBoxInfo.height)
+      val knowledgeForImage = KnowledgeForImage(id = getUUID(), imageReference = imageReference)
+      val registContentResultJson = ToposoidUtils.callComponent(
+        Json.toJson(knowledgeForImage).toString(),
+        conf.getString("TOPOSOID_CONTENTS_ADMIN_HOST"),
+        conf.getString("TOPOSOID_CONTENTS_ADMIN_PORT"),
+        "registImage",
+        transversalState)
+      val registContentResult: RegistContentResult = Json.parse(registContentResultJson).as[RegistContentResult]
+      registContentResult.knowledgeForImage
+    })
+  }
+
+
 
   def getImageInfo(reference: Reference, imageBoxInfo: ImageBoxInfo, transversalState:TransversalState): KnowledgeForImage = {
     val imageReference = ImageReference(reference: Reference, imageBoxInfo.x, imageBoxInfo.y, imageBoxInfo.weight, imageBoxInfo.height)
@@ -146,4 +168,32 @@ object TestUtilsEx extends LazyLogging {
     }
     Json.toJson(AnalyzedSentenceObjects(updatedAsos, asos.deductionConfiguration)).toString()
   }
+
+
+  def analyzeByBaseDeductionUnitForSemiGlobal(asosJson:String, transversalState: TransversalState):String = {
+  
+    val json = ToposoidUtils.callComponent(asosJson, conf.getString("TOPOSOID_DEDUCTION_UNIT3_HOST"), conf.getString("TOPOSOID_DEDUCTION_UNIT3_PORT"), "execute", transversalState)
+    val verifyingEdges = Json.parse(json).as[List[VerifyingEdges]]
+    val analyzedSentenceObjects = Json.parse(asosJson).as[AnalyzedSentenceObjects]
+    val asos = analyzedSentenceObjects.analyzedSentenceObjects
+    
+    val updatedAsos = asos.foldLeft(List.empty[AnalyzedSentenceObject]){
+      (acc, x) => {
+        val coveredPropositionEdges = verifyingEdges.filter(y => y.sentenceId.equals(x.knowledgeBaseSemiGlobalNode.sentenceId)).head.coveredPropositionEdges
+        val updatedDeductionReult = DeductionResult(
+          status = x.deductionResult.status, 
+          authenticityType = x.deductionResult.authenticityType, 
+          coveredPropositionEdges = coveredPropositionEdges, 
+          evidenceKnowledgeList = x.deductionResult.evidenceKnowledgeList, 
+          havePremiseInGivenProposition = x.deductionResult.havePremiseInGivenProposition, 
+          deductionPhaseType = x.deductionResult.deductionPhaseType
+        )        
+        acc :+ AnalyzedSentenceObject(x.nodeMap, x.edgeList, x.knowledgeBaseSemiGlobalNode, updatedDeductionReult)
+      }
+    }
+    Json.toJson(AnalyzedSentenceObjects(updatedAsos, analyzedSentenceObjects.deductionConfiguration)).toString
+    
+  }
+
+
 }
