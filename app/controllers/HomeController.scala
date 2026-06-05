@@ -95,7 +95,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         //TODO: sentenceIdsに限定して、featureVectorSearchResultが存在するかを確認する。
 
         featureVectorSearchResult.ids.size match {
-          case 0 => acc
+          case 0 => acc ::: aso.deductionResult.coveredPropositionEdges
           case _ => {
             acc  ::: DeductionUtilsForSemiGlobal.getCoveredPropositionEdges(true, aso, featureVectorSearchResult, transversalState)
           }
