@@ -82,7 +82,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
     originalUrlOrReference = "https://farm2.staticflickr.com/1070/5110702674_350f5b367d_z.jpg")
   val imageBoxInfo4 = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
 
-  val paraphrase1 = "There are two pets."
+  val paraphrase1 = "There are cats."
   val referencePara1Ok = Reference(url = "", surface = "pets", surfaceIndex = 3, isWholeSentence = false,
     originalUrlOrReference = "http://images.cocodataset.org/val2017/000000039769.jpg")
   val imageBoxInfoPara1Ok = ImageBoxInfo(x = 11, y = 11, weight = 466, height = 310)
@@ -90,7 +90,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
     originalUrlOrReference = "https://farm8.staticflickr.com/7287/8737869589_16ab5a83c4_z.jpg")
   val imageBoxInfoPara1Ng = ImageBoxInfo(x = 0, y = 0, weight = 630, height = 420)
 
-  val paraphrase2 = "There is an animal"
+  val paraphrase2 = "There is a animal."
   val referencePara2Ok = Reference(url = "", surface = "animal", surfaceIndex = 3, isWholeSentence = false,
     originalUrlOrReference = "http://images.cocodataset.org/train2017/000000428746.jpg")
   val imageBoxInfoPara2Ok = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
