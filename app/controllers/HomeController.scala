@@ -57,13 +57,21 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
       val json = request.body
       val analyzedSentenceObjects: AnalyzedSentenceObjects = Json.parse(json.toString).as[AnalyzedSentenceObjects]
       val asos: List[AnalyzedSentenceObject] = analyzedSentenceObjects.analyzedSentenceObjects
-      val result:List[VerifyingEdges] = asos.foldLeft(List.empty[VerifyingEdges]){
-        (acc, aso) => {    
-          acc :+ VerifyingEdges(            
-            propositionId = aso.knowledgeBaseSemiGlobalNode.propositionId,
-            sentenceId = aso.knowledgeBaseSemiGlobalNode.sentenceId,
-            coveredPropositionEdges = analyzeGraphKnowledgeForSemiGlobal(aso, transversalState)
-          )
+      //sentence全体を説明する画像がない場合、推論する意味はない。
+      val result:List[VerifyingEdges] = asos.filter(x => x.knowledgeBaseSemiGlobalNode.localContextForFeature.knowledgeFeatureReferences.filter(y => y.featureType == FeatureType.IMAGE.index).size > 0).size match {
+        case 0 => {
+          List.empty[VerifyingEdges]
+        }
+        case _ => {
+          asos.foldLeft(List.empty[VerifyingEdges]){
+            (acc, aso) => {    
+              acc :+ VerifyingEdges(            
+                propositionId = aso.knowledgeBaseSemiGlobalNode.propositionId,
+                sentenceId = aso.knowledgeBaseSemiGlobalNode.sentenceId,
+                coveredPropositionEdges = analyzeGraphKnowledgeForSemiGlobal(aso, transversalState)
+              )
+            }
+          }
         }
       }
       logger.info(ToposoidUtils.formatMessageForLogger("Embedded Image In Whole Sentence analysis completed.", transversalState.userId))      
