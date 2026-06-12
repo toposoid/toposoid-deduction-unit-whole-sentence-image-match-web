@@ -138,7 +138,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ok, imageBoxInfoPara2Ok)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))
@@ -184,7 +184,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ng, imageBoxInfoPara2Ng)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))
@@ -230,7 +230,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ok, imageBoxInfoPara2Ok)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))
@@ -277,7 +277,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ng, imageBoxInfoPara2Ng)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))
@@ -336,7 +336,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ok, imageBoxInfoPara2Ok), (referencePara3Ok, imageBoxInfoPara3Ok), (referencePara4Ok, imageBoxInfoPara4Ok)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))
@@ -402,7 +402,7 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
 
       val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok), (referencePara2Ng, imageBoxInfoPara2Ng), (referencePara3Ok, imageBoxInfoPara3Ok), (referencePara4Ng, imageBoxInfoPara4Ng)), transversalState), transversalState)
       //val json = addImageInfoToAnalyzedSentenceObjects(lang=lang, inputSentence, getImageInfo2(List((referencePara1Ok, imageBoxInfoPara1Ok)), transversalState), transversalState)
-      val updatedAsosJson = TestUtilsEx.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
+      val updatedAsosJson = TestUtils.analyzeByBaseDeductionUnitForSemiGlobal(json, transversalState)
       val fr = FakeRequest(POST, "/execute")
         .withHeaders("Content-type" -> "application/json", TRANSVERSAL_STATE.str -> transversalStateJson)
         .withJsonBody(Json.parse(updatedAsosJson))

@@ -172,7 +172,7 @@ object TestUtilsEx extends LazyLogging {
     Json.toJson(AnalyzedSentenceObjects(updatedAsos, asos.deductionConfiguration)).toString()
   }
 
-
+  /*
   def analyzeByBaseDeductionUnitForSemiGlobal(asosJson:String, transversalState: TransversalState):String = {
   
     val json = ToposoidUtils.callComponent(asosJson, conf.getString("TOPOSOID_DEDUCTION_UNIT3_HOST"), conf.getString("TOPOSOID_DEDUCTION_UNIT3_PORT"), "execute", transversalState)
@@ -194,9 +194,8 @@ object TestUtilsEx extends LazyLogging {
         acc :+ AnalyzedSentenceObject(x.nodeMap, x.edgeList, x.knowledgeBaseSemiGlobalNode, updatedDeductionReult)
       }
     }
-    Json.toJson(AnalyzedSentenceObjects(updatedAsos, analyzedSentenceObjects.deductionConfiguration)).toString
-    
+    Json.toJson(AnalyzedSentenceObjects(updatedAsos, analyzedSentenceObjects.deductionConfiguration)).toString    
   }
-
+  */
 
 }
