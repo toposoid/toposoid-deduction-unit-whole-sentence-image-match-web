@@ -105,7 +105,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
         featureVectorSearchResult.ids.size match {
           case 0 => acc ::: aso.deductionResult.coveredPropositionEdges
           case _ => {
-            acc  ::: DeductionUtilsForSemiGlobal.getCoveredPropositionEdges(true, aso, featureVectorSearchResult, transversalState)
+            acc  ::: DeductionUtilsForSemiGlobal.getCoveredPropositionEdges(true, aso, featureVectorSearchResult, FeatureType.IMAGE, transversalState)
           }
         }
       }
