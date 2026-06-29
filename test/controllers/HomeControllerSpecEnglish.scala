@@ -63,54 +63,54 @@ class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with Before
   val controller: HomeController = inject[HomeController]
 
   val sentence1 = "There are two cats."
-  val reference1 = Reference(url = "", surface = "cats", surfaceIndex = 3, isWholeSentence = false,
+  val reference1 = Reference(url = "", surface = "cats", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/val2017/000000039769.jpg")
   val imageBoxInfo1 = ImageBoxInfo(x = 11, y = 11, weight = 466, height = 310)
 
   val sentence2 = "There is a dog."
-  val reference2 = Reference(url = "", surface = "dog", surfaceIndex = 3, isWholeSentence = false,
+  val reference2 = Reference(url = "", surface = "dog", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/train2017/000000428746.jpg")
   val imageBoxInfo2 = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
 
   val sentence3 = "A large truck is parked."
-  val reference3 = Reference(url = "", surface = "truck", surfaceIndex = 2, isWholeSentence = false,
+  val reference3 = Reference(url = "", surface = "truck", surfaceIndex = 2, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7103/7210629614_5a388d9a9c_z.jpg")
   val imageBoxInfo3 = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
 
   val sentence4 = "Two jets are flying."
-  val reference4 = Reference(url = "", surface = "jets", surfaceIndex = 1, isWholeSentence = false,
+  val reference4 = Reference(url = "", surface = "jets", surfaceIndex = 1, isWholeSentence = true,
     originalUrlOrReference = "https://farm2.staticflickr.com/1070/5110702674_350f5b367d_z.jpg")
   val imageBoxInfo4 = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
 
   val paraphrase1 = "There are cats."
-  val referencePara1Ok = Reference(url = "", surface = "pets", surfaceIndex = 3, isWholeSentence = false,
+  val referencePara1Ok = Reference(url = "", surface = "pets", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/val2017/000000039769.jpg")
   val imageBoxInfoPara1Ok = ImageBoxInfo(x = 11, y = 11, weight = 466, height = 310)
-  val referencePara1Ng = Reference(url = "", surface = "pets", surfaceIndex = 3, isWholeSentence = false,
+  val referencePara1Ng = Reference(url = "", surface = "pets", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7287/8737869589_16ab5a83c4_z.jpg")
   val imageBoxInfoPara1Ng = ImageBoxInfo(x = 0, y = 0, weight = 630, height = 420)
 
   val paraphrase2 = "There is a animal."
-  val referencePara2Ok = Reference(url = "", surface = "animal", surfaceIndex = 3, isWholeSentence = false,
+  val referencePara2Ok = Reference(url = "", surface = "animal", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "http://images.cocodataset.org/train2017/000000428746.jpg")
   val imageBoxInfoPara2Ok = ImageBoxInfo(x = 77, y = 98, weight = 433, height = 222)
-  val referencePara2Ng = Reference(url = "", surface = "animal", surfaceIndex = 3, isWholeSentence = false,
+  val referencePara2Ng = Reference(url = "", surface = "animal", surfaceIndex = 3, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7287/8737869589_16ab5a83c4_z.jpg")
   val imageBoxInfoPara2Ng = ImageBoxInfo(x = 0, y = 0, weight = 630, height = 420)
 
   val paraphrase3 = "A large vehicle is parked."
-  val referencePara3Ok = Reference(url = "", surface = "vehicle", surfaceIndex = 2, isWholeSentence = false,
+  val referencePara3Ok = Reference(url = "", surface = "vehicle", surfaceIndex = 2, isWholeSentence = true,
     originalUrlOrReference = "https://farm8.staticflickr.com/7103/7210629614_5a388d9a9c_z.jpg")
   val imageBoxInfoPara3Ok = ImageBoxInfo(x = 23, y = 25, weight = 601, height = 341)
-  val referencePara3Ng = Reference(url = "", surface = "vehicle", surfaceIndex = 2, isWholeSentence = false,
+  val referencePara3Ng = Reference(url = "", surface = "vehicle", surfaceIndex = 2, isWholeSentence = true,
     originalUrlOrReference = "https://farm6.staticflickr.com/5195/7185346178_7e2664b081_z.jpg")
   val imageBoxInfoPara3Ng = ImageBoxInfo(x = 0, y = 0, weight = 640, height = 480)
 
   val paraphrase4 = "Two planes are flying."
-  val referencePara4Ok = Reference(url = "", surface = "planes", surfaceIndex = 1, isWholeSentence = false,
+  val referencePara4Ok = Reference(url = "", surface = "planes", surfaceIndex = 1, isWholeSentence = true,
     originalUrlOrReference = "https://farm2.staticflickr.com/1070/5110702674_350f5b367d_z.jpg")
   val imageBoxInfoPara4Ok = ImageBoxInfo(x = 223, y = 108, weight = 140, height = 205)
-  val referencePara4Ng = Reference(url = "", surface = "planes", surfaceIndex = 1, isWholeSentence = false,
+  val referencePara4Ng = Reference(url = "", surface = "planes", surfaceIndex = 1, isWholeSentence = true,
     originalUrlOrReference = "https://farm6.staticflickr.com/5177/5478834869_87a4ac58ec_z.jpg")
   val imageBoxInfoPara4Ng = ImageBoxInfo(x = 0, y = 0, weight = 640, height = 292)
 
