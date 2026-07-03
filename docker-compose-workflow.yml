@@ -113,6 +113,7 @@ services:
       - PLAY_HTTP_PORT=9001
     ports:
       - 9001:9001
+      
   toposoid-common-nlp-japanese-web:
     image: toposoid/toposoid-common-nlp-japanese-web:0.7-SNAPSHOT-lowspec
     environment:
