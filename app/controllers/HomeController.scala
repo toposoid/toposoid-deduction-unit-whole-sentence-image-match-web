@@ -40,6 +40,7 @@ import com.ideal.linked.toposoid.knowledgebase.model.KnowledgeBaseNode
 import com.ideal.linked.toposoid.protocol.model.base.CoveredPropositionNode
 import com.ideal.linked.toposoid.knowledgebase.featurevector.model.StatusInfo
 import com.ideal.linked.toposoid.knowledgebase.regist.model.Knowledge
+import com.ideal.linked.toposoid.knowledgebase.image.model.SingleImage
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -94,7 +95,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
     aso.knowledgeBaseSemiGlobalNode.localContextForFeature.knowledgeFeatureReferences.foldLeft(List.empty[CoveredPropositionEdge]) {
       (acc, x) => {
-        val featureVectorSearchResult = FeatureVectorizer.getFeatureVectorSearchResult(FeatureType.IMAGE,  "", "",  x.url, transversalState)        
+        val featureVectorSearchResult = FeatureVectorizer.getFeatureVectorSearchResult(FeatureType.IMAGE,  "", "",  Option(SingleImage(url = x.url)), transversalState)        
         val sentenceIds = aso.deductionResult.coveredPropositionEdges.foldLeft(List.empty[String]){
           (acc, x) =>
             acc ++ x.sourceNode.matchedKnowledgeNodes.map(y => "'" + y.sentenceId + "'")
