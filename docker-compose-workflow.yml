@@ -25,6 +25,8 @@ services:
       - TOPOSOID_COMMON_IMAGE_RECOGNITION_PORT=9013
       - TOPOSOID_CONTENTS_ADMIN_HOST=toposoid-contents-admin-web
       - TOPOSOID_CONTENTS_ADMIN_PORT=9012
+      - TOPOSOID_FILE_UPLOAD_FACADE_HOST=toposoid-file-upload-facade-web
+      - TOPOSOID_FILE_UPLOAD_FACADE_PORT=9024
       - PLAY_HTTP_PORT=9105
     ports:
       - 9105:9105
