@@ -39,8 +39,7 @@ import com.ideal.linked.toposoid.common.ActionModeType
 import com.ideal.linked.toposoid.protocol.model.base.VerifyingEdges
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForImage
 import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
-import controllers.TestUtilsEx.getAnalyzedSentenceObjectsJsonForSemiGlobal
-import com.ideal.linked.toposoid.test.utils.TestUtils.uploadImage
+import com.ideal.linked.toposoid.test.utils.TestUtils.{uploadImage, getAnalyzedSentenceObjectsJsonForSemiGlobal}
 
 class HomeControllerSpecEnglish extends PlaySpec with BeforeAndAfter with BeforeAndAfterAll with GuiceOneAppPerSuite with DefaultAwaitTimeout with Injecting {
 

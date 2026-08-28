@@ -24,7 +24,7 @@ import com.ideal.linked.toposoid.knowledgebase.regist.model.{Knowledge, Proposit
 import com.ideal.linked.toposoid.protocol.model.base.AnalyzedSentenceObjects
 import com.ideal.linked.toposoid.protocol.model.parser.{InputSentenceForParser, KnowledgeForParser, KnowledgeSentenceSetForParser}
 import com.ideal.linked.toposoid.test.utils.TestUtils
-import controllers.TestUtilsEx.{getAnalyzedSentenceObjectsJsonForSemiGlobal, getUUID, registerSingleClaim}
+import controllers.TestUtilsEx.{getUUID, registerSingleClaim}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -39,7 +39,7 @@ import com.ideal.linked.toposoid.common.ActionModeType
 import com.ideal.linked.toposoid.protocol.model.base.VerifyingEdges
 import com.ideal.linked.toposoid.knowledgebase.regist.model.ImageReference
 import com.ideal.linked.toposoid.knowledgebase.regist.model.KnowledgeForImage
-import com.ideal.linked.toposoid.test.utils.TestUtils.uploadImage
+import com.ideal.linked.toposoid.test.utils.TestUtils.{uploadImage, getAnalyzedSentenceObjectsJsonForSemiGlobal}
 
 class HomeControllerSpecJapanese extends PlaySpec with BeforeAndAfter with BeforeAndAfterAll with GuiceOneAppPerSuite with DefaultAwaitTimeout with Injecting {
 

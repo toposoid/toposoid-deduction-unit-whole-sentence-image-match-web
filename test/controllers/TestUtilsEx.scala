@@ -71,7 +71,7 @@ object TestUtilsEx extends LazyLogging {
     usedUuidList = usedUuidList :+ uuid
     uuid
   }
-
+  /*
   def getAnalyzedSentenceObjectsJsonForSemiGlobal(lang:String,inputSentenceForParser: InputSentenceForParser, transversalState:TransversalState/*, knowledgeForImages:List[KnowledgeForImage]=List.empty[KnowledgeForImage], knowledgeForTables:List[KnowledgeForTable]=List.empty[KnowledgeForTable]*/): String = {
     
     val inputSentenceForParserJson = Json.toJson(inputSentenceForParser).toString
@@ -144,5 +144,5 @@ object TestUtilsEx extends LazyLogging {
     }
     Json.toJson(AnalyzedSentenceObjects(updatedAsos, asos.deductionConfiguration)).toString()
   }
-
+  */
 }
