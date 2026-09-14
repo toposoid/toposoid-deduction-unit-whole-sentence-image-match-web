@@ -94,14 +94,20 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def analyzeGraphKnowledgeForSemiGlobal(aso: AnalyzedSentenceObject, transversalState:TransversalState): List[CoveredPropositionEdge] = {
 
     aso.knowledgeBaseSemiGlobalNode.localContextForFeature.knowledgeFeatureReferences.foldLeft(List.empty[CoveredPropositionEdge]) {
-      (acc, x) => {
-        val featureVectorSearchResult = FeatureVectorizer.getFeatureVectorSearchResult(FeatureType.IMAGE,  "", "",  Option(SingleImage(url = x.url)), transversalState)        
-        val sentenceIds = aso.deductionResult.coveredPropositionEdges.foldLeft(List.empty[String]){
-          (acc, x) =>
-            acc ++ x.sourceNode.matchedKnowledgeNodes.map(y => "'" + y.sentenceId + "'")
-        }.distinct
-
-        //TODO: sentenceIdsに限定して、featureVectorSearchResultが存在するかを確認する。
+      (acc, x) => {        
+        val featureVectorSearchResult = x.featureType match {
+          case FeatureType.IMAGE.index => {
+            FeatureVectorizer.getFeatureVectorSearchResult(FeatureType.IMAGE,  "", "",  Option(SingleImage(url = x.url)), transversalState)        
+            /*
+            val sentenceIds = aso.deductionResult.coveredPropositionEdges.foldLeft(List.empty[String]){
+              (acc, x) =>
+                acc ++ x.sourceNode.matchedKnowledgeNodes.map(y => "'" + y.sentenceId + "'")
+            }.distinct
+            */
+            //TODO: sentenceIdsに限定して、featureVectorSearchResultが存在するかを確認する。
+          }
+          case _ => FeatureVectorSearchResult(List.empty[FeatureVectorIdentifier], List.empty[Float], StatusInfo("OK", ""))
+        }
 
         featureVectorSearchResult.ids.size match {
           case 0 => acc ::: aso.deductionResult.coveredPropositionEdges
